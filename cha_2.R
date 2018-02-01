@@ -18,3 +18,20 @@ summaryBy(Gender+Signed_In+Impressions+Clicks~agecat,data=dataFrame)
 library(ggplot2)
 ggplot(nyt1,aes(x=Impressions,fill=agecat))+geom_histogram(binwidth = 1)
 ggplot(nyt1,aes(x=agecat,y=Impressions,fill=agecat))+geom_boxplot()
+
+dataFrame$hasimps <- cut(dataFrame$Impressions,c(-Inf,0,Inf))
+summaryBy(Clicks ~hasimps,data=dataFrame,Fun=siterange)
+
+ggplot(subset(dataFrame,Impressions>0),aes(x=Clicks/Impressions,colour=agecat))+geom_density()
+ggplot(subset(dataFrame,Clicks>0),aes(x=Clicks/Impressions,colour=agecat))+geom_density()
+ggplot(subset(dataFrame,Clicks>0),aes(x=agecat,y=Clicks,fill=agecat))+geom_boxplot()
+ggplot(subset(dataFrame,Clicks>0),aes(x=Clicks,colour=agecat))+geom_density()
+
+dataFrame$scode[dataFrame$Impressions==0] <- "NoImps"
+dataFrame$scode[dataFrame$Impressions>0]<- "Imps"
+dataFrame$scode[dataFrame$Clicks>0]<-"Clicks"
+dataFrame$scode<-factor(dataFrame$scode)
+head(dataFrame)
+
+clen<-function(x){c(length(x))}
+etable<-summaryBy(Impressions~scode+Gender+agecat,data=dataFrame,FUN=clen)
